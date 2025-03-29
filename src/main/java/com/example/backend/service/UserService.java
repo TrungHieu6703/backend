@@ -1,14 +1,23 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.request.LoginDTO;
 import com.example.backend.dto.request.UserDTO;
 import com.example.backend.dto.response.UserRes;
 import com.example.backend.entity.User;
 import com.example.backend.enums.RoleEnum;
 import com.example.backend.repository.UserRepo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,12 +25,21 @@ public class UserService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     public UserRes createUser(UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setName(userDTO.getName());
-        user.setRole(RoleEnum.USER);
+        user.setRole(RoleEnum.ROLE_USER);
         user.setPhone(userDTO.getPhone());
         user.setEmail(userDTO.getEmail());
 
@@ -35,6 +53,25 @@ public class UserService {
                 result.getRole(),
                 result.getPhone(),
                 result.getEmail());
+    }
+
+    public Map<String, String> login(LoginDTO loginDTO, HttpServletResponse rs, HttpServletRequest req) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDTO.email(), loginDTO.password())
+            );
+
+            String token = jwtService.generateToken(loginDTO.email());
+            String refreshToken = jwtService.generateRefreshToken(loginDTO.email());
+
+            // Trả về JSON hợp lệ
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("Authentication failed", e);
+        }
     }
 
     public UserRes updateUser(String id, UserDTO userDTO) {

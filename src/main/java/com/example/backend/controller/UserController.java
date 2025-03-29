@@ -1,15 +1,19 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.request.LoginDTO;
 import com.example.backend.dto.request.UserDTO;
 import com.example.backend.dto.response.ApiResponse;
 import com.example.backend.dto.response.UserRes;
 import com.example.backend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -18,8 +22,16 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, HttpServletResponse rs, HttpServletRequest req) {
+        Map<String, String> response = userService.login(loginDTO, rs, req);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+
     // Tạo mới User
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserRes>> createUser(@RequestBody UserDTO userDTO) {
         UserRes userRes = userService.createUser(userDTO);
         ApiResponse<UserRes> response = new ApiResponse<>("User created successfully", HttpStatus.CREATED.value(), userRes);

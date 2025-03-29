@@ -42,7 +42,7 @@ public class Product {
 
     int quantity;
 
-    Boolean is_hot;
+    boolean is_hot;
 
     @Column(columnDefinition = "Text")
     String specs_summary;

@@ -53,6 +53,7 @@ public class BrandController {
     }
 
     // Lấy tất cả Brand
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping
     public ResponseEntity<ApiResponse<List<BrandRes>>> getAllBrands() {
         List<BrandRes> brands = brandService.getAllBrands();
