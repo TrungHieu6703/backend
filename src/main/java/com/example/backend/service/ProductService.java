@@ -8,6 +8,7 @@ import com.example.backend.dto.response.ProductResponseDTO;
 import com.example.backend.entity.*;
 import com.example.backend.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -121,6 +122,17 @@ public class ProductService {
 //                savedProduct.getImages(), savedProduct.getDescription());
     }
 
+    @Transactional
+    public void deleteProduct(String id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+
+        // Xóa các thuộc tính liên quan đến sản phẩm
+        productAttributeValueRepo.deleteByProductId(id);
+
+        // Xóa sản phẩm
+        productRepo.delete(product);
+    }
 //    public ProductRes updateProduct(String id, ProductDTO productDTO) {
 //        Product product = productRepo.findById(id)
 //                .orElseThrow(() -> new RuntimeException("Product not found"));

@@ -107,4 +107,19 @@ public class UserService {
                 .map(user -> new UserRes(user.getId(), user.getUsername(), user.getPassword(), user.getName(),user.getRole(),user.getPhone(), user.getEmail()))
                 .collect(Collectors.toList());
     }
+
+    public UserRes getUserByEmail(String email) {
+        System.out.println(email);
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new UserRes(
+                user.getId(),
+                user.getUsername(),
+                null, // Không trả về password
+                user.getName(),
+                user.getRole(),
+                user.getPhone(),
+                user.getEmail()
+        );
+    }
 }

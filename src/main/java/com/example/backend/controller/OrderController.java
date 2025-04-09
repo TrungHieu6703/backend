@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.request.OrderDTO;
 import com.example.backend.dto.response.ApiResponse;
 import com.example.backend.dto.response.OrderRes;
+import com.example.backend.enums.StatusEnum;
 import com.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    // Tạo mới Order
+    // Tạo mới Order với các item
     @PostMapping
     public ResponseEntity<ApiResponse<OrderRes>> createOrder(@RequestBody OrderDTO orderDTO) {
         OrderRes orderRes = orderService.createOrder(orderDTO);
@@ -31,6 +32,16 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderRes>> updateOrder(@PathVariable String id, @RequestBody OrderDTO orderDTO) {
         OrderRes updatedOrder = orderService.updateOrder(id, orderDTO);
         ApiResponse<OrderRes> response = new ApiResponse<>("Order updated successfully", HttpStatus.OK.value(), updatedOrder);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // Cập nhật trạng thái Order
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<OrderRes>> updateOrderStatus(
+            @PathVariable String id,
+            @RequestParam StatusEnum status) {
+        OrderRes updatedOrder = orderService.updateOrderStatus(id, status);
+        ApiResponse<OrderRes> response = new ApiResponse<>("Order status updated successfully", HttpStatus.OK.value(), updatedOrder);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -55,6 +66,14 @@ public class OrderController {
     public ResponseEntity<ApiResponse<List<OrderRes>>> getAllOrders() {
         List<OrderRes> orders = orderService.getAllOrders();
         ApiResponse<List<OrderRes>> response = new ApiResponse<>("All orders retrieved successfully", HttpStatus.OK.value(), orders);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // Lấy tất cả Orders của một user
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<List<OrderRes>>> getOrdersByUserId(@PathVariable String userId) {
+        List<OrderRes> orders = orderService.getOrdersByUserId(userId);
+        ApiResponse<List<OrderRes>> response = new ApiResponse<>("User orders retrieved successfully", HttpStatus.OK.value(), orders);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

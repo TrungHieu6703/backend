@@ -67,6 +67,17 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    @CrossOrigin(origins = "http://localhost:4200")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.noContent().build(); // 204 No Content
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 //    // Cập nhật Product theo ID
 //    @PutMapping("/{id}")
 //    public ResponseEntity<ApiResponse<ProductRes>> updateProduct(@PathVariable String id, @RequestBody ProductDTO productDTO) {

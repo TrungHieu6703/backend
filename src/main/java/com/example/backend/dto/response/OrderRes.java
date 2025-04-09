@@ -8,17 +8,24 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderRes {
-    String id;
+    private String id;
+    private String userId;
+    private StatusEnum status;
+    private BigDecimal total;
+    private List<OrderDetailRes> orderDetails;
 
-    String user_id;
-
-    StatusEnum status;
-
-    BigDecimal total;
+    // Constructor without orderDetails for backward compatibility
+    public OrderRes(String id, String userId, StatusEnum status, BigDecimal total) {
+        this.id = id;
+        this.userId = userId;
+        this.status = status;
+        this.total = total;
+    }
 }

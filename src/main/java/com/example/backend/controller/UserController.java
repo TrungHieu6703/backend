@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +31,15 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserRes>> getCurrentUser(HttpServletRequest request) {
+        // Lấy thông tin người dùng từ SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
 
+        UserRes currentUser = userService.getUserByEmail(email);
+        ApiResponse<UserRes> response = new ApiResponse<>("User information retrieved successfully", HttpStatus.OK.value(), currentUser);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     // Tạo mới User
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserRes>> createUser(@RequestBody UserDTO userDTO) {

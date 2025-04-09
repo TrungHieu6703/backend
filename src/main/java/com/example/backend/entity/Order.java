@@ -32,6 +32,9 @@ public class Order {
 
     BigDecimal total;
 
+    @Column(columnDefinition = "TEXT")
+    String shippingInfo;
+
     @OneToMany(mappedBy = "order")
     Set<OrderDetail> orderDetails = new HashSet<>();
 }
