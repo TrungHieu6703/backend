@@ -16,6 +16,7 @@ import com.example.backend.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -101,6 +102,7 @@ public class OrderService {
                 savedOrder.getUser().getId(),
                 savedOrder.getStatus(),
                 savedOrder.getTotal(),
+                savedOrder.getCreatedDate(),
                 orderDetails
         );
     }
@@ -144,6 +146,7 @@ public class OrderService {
                 updatedOrder.getUser().getId(),
                 updatedOrder.getStatus(),
                 updatedOrder.getTotal(),
+                updatedOrder.getCreatedDate(),
                 orderDetailResList
         );
     }
@@ -173,6 +176,7 @@ public class OrderService {
                 updatedOrder.getUser().getId(),
                 updatedOrder.getStatus(),
                 updatedOrder.getTotal(),
+                updatedOrder.getCreatedDate(),
                 orderDetailResList
         );
     }
@@ -218,6 +222,7 @@ public class OrderService {
                 order.getUser().getId(),
                 order.getStatus(),
                 order.getTotal(),
+                order.getCreatedDate(),
                 orderDetailResList
         );
     }
@@ -243,6 +248,7 @@ public class OrderService {
                             order.getUser().getId(),
                             order.getStatus(),
                             order.getTotal(),
+                            order.getCreatedDate(),
                             orderDetailResList
                     );
                 })
@@ -270,6 +276,7 @@ public class OrderService {
                             order.getUser().getId(),
                             order.getStatus(),
                             order.getTotal(),
+                            order.getCreatedDate(),
                             orderDetailResList
                     );
                 })

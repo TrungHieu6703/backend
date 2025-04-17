@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,9 +35,23 @@ public class GroupController {
     }
 
     @GetMapping("attrbutes/{id}/value")
-    public List<AttributeValue> getAttributeValueByAttributeId(@PathVariable String id) {
-        List<AttributeValue> AttributeValue = attributeValueRepo.findByAttribute_Id(id);
-        return AttributeValue;
+    public ResponseEntity<?> getAttributeValueByAttributeId(@PathVariable String id) {
+        try {
+            List<Map<String, Object>> result = attributeValueRepo.findByAttribute_Id(id)
+                    .stream()
+                    .map(av -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", av.getId());
+                        map.put("value", av.getValue());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
+        }
     }
 
 //    @GetMapping("categories/{id}/attributes")

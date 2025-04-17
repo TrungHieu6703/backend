@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDTO {
+
      String name;
 
      String categoryId;

@@ -6,8 +6,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ProductAttributeValueRepo extends JpaRepository<ProductAttributeValue, String> {
     @Modifying
     @Query("DELETE FROM ProductAttributeValue pav WHERE pav.product.id = :productId")
     void deleteByProductId(@Param("productId") String productId);
+
+    List<ProductAttributeValue> findByProductId(String productId);
 }

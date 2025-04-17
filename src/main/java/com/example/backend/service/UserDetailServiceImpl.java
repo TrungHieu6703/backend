@@ -19,7 +19,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(()-> new EntityNotFoundException("User not found"));
         String role = String.valueOf(user.getRole());
-        System.out.println(role);
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())

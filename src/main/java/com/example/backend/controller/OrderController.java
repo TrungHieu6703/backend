@@ -70,6 +70,7 @@ public class OrderController {
     }
 
     // Lấy tất cả Orders của một user
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<OrderRes>>> getOrdersByUserId(@PathVariable String userId) {
         List<OrderRes> orders = orderService.getOrdersByUserId(userId);

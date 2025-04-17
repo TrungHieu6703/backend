@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,10 +21,12 @@ public class ProductAttributeValue {
 
     @ManyToOne
     @JoinColumn(name = "attribute_value_id")
+    @JsonIgnore
     AttributeValue attributeValue;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     Product product;
 
     String value;

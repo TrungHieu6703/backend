@@ -1,8 +1,5 @@
-package com.example.backend.dto.request;
+package com.example.backend.dto.response;
 
-import com.example.backend.enums.RoleEnum;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,13 +10,14 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDTO {
-
-    String password;
+public class ProductFilterDTO {
+    String id;
 
     String name;
 
-    String phone;
+    String price;
 
-    String email;
+    String quantity;
+
+    String avatar;
 }

@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.response.CartResponse;
+import com.example.backend.dto.response.ProductCompareDTO;
 import com.example.backend.entity.Brand;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.Product_line;
@@ -32,13 +33,23 @@ public class LaptopController {
         return laptopService.getProductLinesByBrand(brandId);
     }
 
+    // LaptopController.java (phần compare)
     @GetMapping("/compare")
-    public ResponseEntity<List<Product>> compareLaptops(@RequestParam List<String> ids) {
+    public ResponseEntity<List<ProductCompareDTO>> compareLaptops(@RequestParam List<String> ids) {
         if (ids.size() < 2 || ids.size() > 4) {
             return ResponseEntity.badRequest().body(null);
         }
-        List<Product> laptops = laptopService.compareLaptops(ids);
-        return ResponseEntity.ok(laptops);
+        List<ProductCompareDTO> compareResult = laptopService.compareProductsWithAttributes(ids);
+        return ResponseEntity.ok(compareResult);
+    }
+
+    @GetMapping("/product/{id}")
+    public ResponseEntity<ProductCompareDTO> getProductWithAttributes(@PathVariable String id) {
+        ProductCompareDTO productDetail = laptopService.getProductWithAttributes(id);
+        if (productDetail == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(productDetail);
     }
 
     @GetMapping("/items")

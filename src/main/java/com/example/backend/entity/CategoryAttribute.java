@@ -25,4 +25,6 @@ public class CategoryAttribute {
     @ManyToOne
     @JoinColumn(name = "category_id")
     Category category;
+
+    boolean visible;
 }

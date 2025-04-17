@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class AttributeValue {
 
     @ManyToOne
     @JoinColumn(name = "attribute_id")
+    @JsonIgnore
     Attribute attribute;
 
     @OneToMany(mappedBy = "attributeValue")

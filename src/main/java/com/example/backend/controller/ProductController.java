@@ -2,6 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.request.AttributeValueDes;
 import com.example.backend.dto.request.ProductDTO;
+import com.example.backend.dto.response.ApiResponse;
+import com.example.backend.dto.response.ProductRes;
 import com.example.backend.dto.response.ProductResponseDTO;
 import com.example.backend.entity.Product;
 import com.example.backend.repository.AttributeValueRepo;
@@ -95,12 +97,12 @@ public class ProductController {
 //    }
 //
 //    // Lấy Product theo ID
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ApiResponse<ProductRes>> getProductById(@PathVariable String id) {
-//        ProductRes productRes = productService.getProductById(id);
-//        ApiResponse<ProductRes> response = new ApiResponse<>("Product retrieved successfully", HttpStatus.OK.value(), productRes);
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductRes>> getProductById(@PathVariable String id) {
+        ProductRes productRes = productService.getProductById(id);
+        ApiResponse<ProductRes> response = new ApiResponse<>("Product retrieved successfully", HttpStatus.OK.value(), productRes);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 //
 //    // Lấy tất cả Product
 //    @GetMapping

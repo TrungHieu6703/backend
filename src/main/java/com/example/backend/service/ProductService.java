@@ -166,16 +166,16 @@ public class ProductService {
 //        productRepo.delete(product);
 //    }
 //
-//    public ProductRes getProductById(String id) {
-//        Product product = productRepo.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Product not found"));
-//        return new ProductRes(product.getId(), product.getName(),
-//                product.getCategory().getId(),
-//                product.getBrand().getId(),
-//                product.getCoupon() != null ? product.getCoupon().getId() : null,
-//                product.getPrice(), product.getQuantity(),
-//                product.getImage(), product.getDescription());
-//    }
+    public ProductRes getProductById(String id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        return new ProductRes(product.getId(), product.getName(),
+                product.getCategory().getId(),
+                product.getBrand().getId(),
+                product.getCoupon() != null ? product.getCoupon().getId() : null,
+                product.getPrice(), product.getQuantity(),
+                product.getImages(), product.getDescription());
+    }
 //
 //    public List<ProductRes> getAllProducts() {
 //        List<Product> products = productRepo.findAll();

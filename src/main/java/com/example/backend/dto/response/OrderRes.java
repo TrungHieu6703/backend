@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,6 +20,7 @@ public class OrderRes {
     private String userId;
     private StatusEnum status;
     private BigDecimal total;
+    private LocalDateTime createdDate;
     private List<OrderDetailRes> orderDetails;
 
     // Constructor without orderDetails for backward compatibility

@@ -36,7 +36,6 @@ public class UserService {
 
     public UserRes createUser(UserDTO userDTO) {
         User user = new User();
-        user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setName(userDTO.getName());
         user.setRole(RoleEnum.ROLE_USER);
@@ -78,7 +77,6 @@ public class UserService {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.setUsername(userDTO.getUsername());
         user.setPassword(userDTO.getPassword());
         user.setName(userDTO.getName());
         user.setPhone(userDTO.getPhone());
