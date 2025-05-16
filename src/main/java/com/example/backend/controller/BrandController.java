@@ -38,10 +38,9 @@ public class BrandController {
     // Xóa Brand theo ID
     @CrossOrigin(origins = "http://localhost:4200")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteBrand(@PathVariable String id) {
+    public ResponseEntity<?> deleteBrand(@PathVariable String id) {
         brandService.deleteBrand(id);
-        ApiResponse<Void> response = new ApiResponse<>("Brand deleted successfully", HttpStatus.OK.value(), null);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok().body("Brand deleted successfully");
     }
 
     // Lấy Brand theo ID

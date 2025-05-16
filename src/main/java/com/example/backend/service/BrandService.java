@@ -5,6 +5,7 @@ import com.example.backend.dto.response.BrandRes;
 import com.example.backend.entity.Brand;
 import com.example.backend.entity.Product_line;
 import com.example.backend.repository.BrandRepo;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,9 +40,21 @@ public class BrandService {
         return new BrandRes(updatedBrand.getId(), updatedBrand.getName());
     }
 
-    public void deleteBrand(String id) {
-        Brand brand = brandRepo.findById(id).orElseThrow(()-> new RuntimeException(("Brand not found")));
-        brandRepo.delete(brand);
+    public void deleteBrand(String brandId) {
+        Brand brand = brandRepo.findById(brandId)
+                .orElseThrow(() -> new EntityNotFoundException("Brand not found with id: " + brandId));
+
+        // Kiểm tra xem brand có liên kết với sản phẩm nào không
+        boolean hasProducts = brandRepo.existsProductsByBrandId(brandId);
+
+        if (hasProducts) {
+            // Cập nhật trường is_deleted nếu có liên kết
+            brand.set_deleted(true);
+            brandRepo.save(brand);
+        } else {
+            // Xóa hoàn toàn nếu không có liên kết
+            brandRepo.delete(brand);
+        }
     }
 
     public BrandRes getBrandById(String id) {
@@ -54,7 +67,7 @@ public class BrandService {
     }
 
     public List<BrandRes> getAllBrands() {
-        List<Brand> brands = brandRepo.findAll();
+        List<Brand> brands = brandRepo.findAllActiveBrands();
 
         return brands.stream()
                 .map(brand -> new BrandRes(

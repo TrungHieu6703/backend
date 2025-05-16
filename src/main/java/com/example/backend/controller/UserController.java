@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.request.EmailDTO;
 import com.example.backend.dto.request.LoginDTO;
 import com.example.backend.dto.request.UserDTO;
 import com.example.backend.dto.response.ApiResponse;
@@ -78,5 +79,11 @@ public class UserController {
         List<UserRes> users = userService.getAllUsers();
         ApiResponse<List<UserRes>> response = new ApiResponse<>("All users retrieved successfully", HttpStatus.OK.value(), users);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> sendMail(@RequestBody EmailDTO emailDTO) {
+        return userService.sendMail(emailDTO);
     }
 }

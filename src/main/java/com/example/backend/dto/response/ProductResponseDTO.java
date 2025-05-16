@@ -12,6 +12,9 @@ public class ProductResponseDTO {
     String brand;
     BigDecimal price;
     int quantity;
+    Boolean is_hot;
     String avatar;
+    String description;
+    String specs_summary;
 }
 

@@ -22,9 +22,13 @@ public class ProductRes {
 
     String brand_id;
 
-    String coupon_id;
+    String specs_summary;
+
+    String product_line_id;
 
     BigDecimal price;
+
+    Boolean is_hot;
 
     int quantity;
 

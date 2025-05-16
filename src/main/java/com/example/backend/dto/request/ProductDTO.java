@@ -30,6 +30,9 @@ public class ProductDTO {
 
      String description;
 
+     Boolean is_hot;
+
+     String specs_summary;
      @JsonIgnore
      List<AttributeValueDes> attributeValueDes;
 }

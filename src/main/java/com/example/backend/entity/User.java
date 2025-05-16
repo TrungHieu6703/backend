@@ -35,6 +35,9 @@ public class User {
 
     String email;
 
+    @Column(name = "is_deleted", nullable = false)
+    boolean is_deleted = false;
+
     @OneToMany(mappedBy = "user")
     Set<Order> orders = new HashSet<>();
 }

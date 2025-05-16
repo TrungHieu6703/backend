@@ -27,6 +27,9 @@ public class AttributeValue {
     @JsonIgnore
     Attribute attribute;
 
+    @Column(name = "is_deleted", nullable = false)
+    boolean is_deleted = false;
+
     @OneToMany(mappedBy = "attributeValue")
     Set<ProductAttributeValue> productAttributeValue = new HashSet<>();
 

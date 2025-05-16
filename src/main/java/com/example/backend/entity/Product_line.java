@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,10 +26,11 @@ public class Product_line {
 
     @ManyToOne
     @JoinColumn(name = "brand_id")
+    @JsonIgnore
     Brand brand;
 
-    @Column(columnDefinition = "Text")
-    String line_description;
+    @Column(name = "is_deleted", nullable = false)
+    boolean is_deleted = false;
 
     @OneToMany(mappedBy = "product_line")
     Set<Product> products = new HashSet<>();

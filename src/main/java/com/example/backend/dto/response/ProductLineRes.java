@@ -1,6 +1,5 @@
-package com.example.backend.dto.request;
+package com.example.backend.dto.response;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,11 +8,12 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryDTO {
-    @NotNull(message = "name is required")
-    String name;
+@NoArgsConstructor
+public class ProductLineRes {
+    String id;
 
-    String parentId;
+    String brandId;
+
+    String line_name;
 }

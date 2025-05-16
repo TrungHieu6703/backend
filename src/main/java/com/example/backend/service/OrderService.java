@@ -47,7 +47,8 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setStatus(orderDTO.getStatus() != null ? orderDTO.getStatus() : StatusEnum.PENDING);
-
+        order.setPayment_method(orderDTO.getPayment_method());
+        order.setShippingInfo(orderDTO.getShippingInfo());
         // Tính tổng tiền từ các items nếu không được cung cấp
         if (orderDTO.getTotal() == null) {
             BigDecimal total = BigDecimal.ZERO;
@@ -102,6 +103,8 @@ public class OrderService {
                 savedOrder.getUser().getId(),
                 savedOrder.getStatus(),
                 savedOrder.getTotal(),
+                savedOrder.getPayment_method(),
+                savedOrder.getShippingInfo(),
                 savedOrder.getCreatedDate(),
                 orderDetails
         );
@@ -146,6 +149,8 @@ public class OrderService {
                 updatedOrder.getUser().getId(),
                 updatedOrder.getStatus(),
                 updatedOrder.getTotal(),
+                updatedOrder.getPayment_method(),
+                updatedOrder.getShippingInfo(),
                 updatedOrder.getCreatedDate(),
                 orderDetailResList
         );
@@ -176,6 +181,8 @@ public class OrderService {
                 updatedOrder.getUser().getId(),
                 updatedOrder.getStatus(),
                 updatedOrder.getTotal(),
+                updatedOrder.getPayment_method(),
+                updatedOrder.getShippingInfo(),
                 updatedOrder.getCreatedDate(),
                 orderDetailResList
         );
@@ -222,6 +229,8 @@ public class OrderService {
                 order.getUser().getId(),
                 order.getStatus(),
                 order.getTotal(),
+                order.getPayment_method(),
+                order.getShippingInfo(),
                 order.getCreatedDate(),
                 orderDetailResList
         );
@@ -248,6 +257,8 @@ public class OrderService {
                             order.getUser().getId(),
                             order.getStatus(),
                             order.getTotal(),
+                            order.getPayment_method(),
+                            order.getShippingInfo(),
                             order.getCreatedDate(),
                             orderDetailResList
                     );
@@ -276,6 +287,8 @@ public class OrderService {
                             order.getUser().getId(),
                             order.getStatus(),
                             order.getTotal(),
+                            order.getPayment_method(),
+                            order.getShippingInfo(),
                             order.getCreatedDate(),
                             orderDetailResList
                     );

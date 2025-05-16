@@ -7,9 +7,12 @@ import com.example.backend.dto.response.ProductRes;
 import com.example.backend.dto.response.ProductResponseDTO;
 import com.example.backend.entity.*;
 import com.example.backend.repository.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,7 +73,7 @@ public class ProductService {
         Brand brand = brandRepo.findById(productDTO.getBrandId())
                 .orElseThrow(() -> new RuntimeException("Brand not found"));
 
-        Coupon coupon = couponRepo.findById(productDTO.getCouponId())
+        Product_line product_line = productLineRepo.findById(productDTO.getCouponId())
                 .orElse(null);
 
 
@@ -88,11 +91,13 @@ public class ProductService {
         product.setName(productDTO.getName());
         product.setCategory(category);
         product.setBrand(brand);
-        product.setCoupon(coupon);
+        product.setProduct_line(product_line);
         product.setPrice(new BigDecimal(productDTO.getPrice()));
         product.setQuantity(Integer.parseInt(productDTO.getQuantity()));
         product.setImages(imageUrls);
         product.setDescription(productDTO.getDescription());
+        product.setIs_hot(productDTO.getIs_hot());
+        product.setSpecs_summary(productDTO.getSpecs_summary());
 
         Product newProduct = productRepo.save(product);
 
@@ -122,6 +127,83 @@ public class ProductService {
 //                savedProduct.getImages(), savedProduct.getDescription());
     }
 
+
+    @Transactional
+    @Modifying
+    public ResponseEntity<?> updateProduct(String productId, ProductDTO productDTO, MultipartFile[] files, String existingImagesJson) throws IOException {
+        // Tìm sản phẩm cần cập nhật
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+
+        // Tìm các đối tượng liên quan
+        Category category = categoryRepo.findById(productDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        Brand brand = brandRepo.findById(productDTO.getBrandId())
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
+
+        Product_line product_line = productLineRepo.findById(productDTO.getCouponId())
+                .orElse(null);
+
+        // Xử lý các hình ảnh hiện có
+        List<String> imageUrls = new ArrayList<>();
+        if (existingImagesJson != null && !existingImagesJson.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                List<String> existingImages = mapper.readValue(existingImagesJson, new TypeReference<List<String>>() {});
+                imageUrls.addAll(existingImages);
+            } catch (Exception e) {
+                throw new RuntimeException("Error parsing existing images", e);
+            }
+        }
+
+        // Xử lý và thêm các file mới (nếu có)
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String url = uploadFile(file);
+                    imageUrls.add(url);
+                }
+            }
+        }
+
+        // Cập nhật thông tin sản phẩm
+        product.setName(productDTO.getName());
+        product.setCategory(category);
+        product.setBrand(brand);
+        product.setProduct_line(product_line);
+        product.setPrice(new BigDecimal(productDTO.getPrice()));
+        product.setQuantity(Integer.parseInt(productDTO.getQuantity()));
+        product.setImages(imageUrls);
+        product.setDescription(productDTO.getDescription());
+        product.setIs_hot(productDTO.getIs_hot());
+        product.setSpecs_summary(productDTO.getSpecs_summary());
+
+        // Lưu sản phẩm đã cập nhật
+        Product updatedProduct = productRepo.save(product);
+
+        // Xử lý các thuộc tính sản phẩm
+        // Xóa các thuộc tính cũ
+        productAttributeValueRepo.deleteByProductId(productId);
+
+        // Thêm các thuộc tính mới
+        productDTO.getAttributeValueDes().stream().map(
+                (attribute -> {
+                    AttributeValue attributeValue = attributeValueRepo.findById(attribute.getAttributeValueId()).orElseThrow(
+                            () -> new EntityNotFoundException("attributeValue not found")
+                    );
+                    ProductAttributeValue productAttributeValue = new ProductAttributeValue();
+                    productAttributeValue.setProduct(updatedProduct);
+                    productAttributeValue.setAttributeValue(attributeValue);
+                    productAttributeValue.setValue(attribute.getValue());
+                    productAttributeValueRepo.save(productAttributeValue);
+                    return null;
+                })
+        ).toList();
+
+        return ResponseEntity.ok(updatedProduct);
+    }
+
     @Transactional
     public void deleteProduct(String id) {
         Product product = productRepo.findById(id)
@@ -132,6 +214,12 @@ public class ProductService {
 
         // Xóa sản phẩm
         productRepo.delete(product);
+    }
+
+    public boolean checkQuantityAvailable(String productId, int requestedQuantity) {
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + productId));
+        return product.getQuantity() >= requestedQuantity;
     }
 //    public ProductRes updateProduct(String id, ProductDTO productDTO) {
 //        Product product = productRepo.findById(id)
@@ -172,10 +260,14 @@ public class ProductService {
         return new ProductRes(product.getId(), product.getName(),
                 product.getCategory().getId(),
                 product.getBrand().getId(),
-                product.getCoupon() != null ? product.getCoupon().getId() : null,
-                product.getPrice(), product.getQuantity(),
+                product.getSpecs_summary(),
+                product.getProduct_line() != null ? product.getProduct_line().getId() : null,
+                product.getPrice(),
+                product.getIs_hot(),
+                product.getQuantity(),
                 product.getImages(), product.getDescription());
     }
+
 //
 //    public List<ProductRes> getAllProducts() {
 //        List<Product> products = productRepo.findAll();
@@ -200,7 +292,10 @@ public List<ProductResponseDTO> getAllProducts() {
         dto.setBrand(product.getBrand() != null ? product.getBrand().getName() : null);
         dto.setPrice(product.getPrice());
         dto.setQuantity(product.getQuantity());
+        dto.setIs_hot(product.getIs_hot());
         dto.setAvatar(product.getImages() != null && !product.getImages().isEmpty() ? product.getImages().get(0) : null);
+        dto.setDescription(product.getDescription());
+        dto.setSpecs_summary(product.getSpecs_summary());
         return dto;
     }
 }

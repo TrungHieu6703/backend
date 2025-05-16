@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -38,11 +39,11 @@ public class CategoryController {
     // Xóa Category theo ID
     @CrossOrigin(origins = "http://localhost:4200")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable String id) {
+    public ResponseEntity<?> deleteCategory(@PathVariable String id) {
         categoryService.deleteCategory(id);
-        ApiResponse<Void> response = new ApiResponse<>("Category deleted successfully", HttpStatus.OK.value(), null);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Brand deleted successfully"));
     }
+
 
     // Lấy Category theo ID
     @GetMapping("/{id}")

@@ -24,6 +24,9 @@ public class Brand {
 
     String name;
 
+    @Column(name = "is_deleted", nullable = false)
+    boolean is_deleted = false;
+
     @OneToMany(mappedBy = "brand")
     Set<Product> products = new HashSet<>();
 

@@ -25,6 +25,9 @@ public class Attribute {
 
     String name;
 
+    @Column(name = "is_deleted", nullable = false)
+    boolean is_deleted = false;
+
     @OneToMany(mappedBy = "attribute")
     @JsonIgnore
     Set<AttributeValue> attributeValues = new HashSet<>();

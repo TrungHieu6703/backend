@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.entity.Category;
 import com.example.backend.entity.ProductAttributeValue;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,4 +15,11 @@ public interface ProductAttributeValueRepo extends JpaRepository<ProductAttribut
     void deleteByProductId(@Param("productId") String productId);
 
     List<ProductAttributeValue> findByProductId(String productId);
+
+    @Query("SELECT pav FROM ProductAttributeValue pav WHERE pav.product.id = :productId")
+    List<ProductAttributeValue> findByProductIdd(@Param("productId") String productId);
+
+    @Query("SELECT p.category FROM Product p WHERE p.id = :id")
+    Category findCategoryByProductId(@Param("id") String productId);
+
 }

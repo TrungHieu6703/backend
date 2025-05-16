@@ -16,18 +16,22 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderRes {
-    private String id;
-    private String userId;
-    private StatusEnum status;
-    private BigDecimal total;
-    private LocalDateTime createdDate;
-    private List<OrderDetailRes> orderDetails;
+    String id;
+    String userId;
+    StatusEnum status;
+    BigDecimal total;
+    String payment_method;
+    String shippingInfo;
+    LocalDateTime createdDate;
+    List<OrderDetailRes> orderDetails;
 
     // Constructor without orderDetails for backward compatibility
-    public OrderRes(String id, String userId, StatusEnum status, BigDecimal total) {
+    public OrderRes(String id, String userId, StatusEnum status, BigDecimal total, String payment_method, String shippingInfo) {
         this.id = id;
         this.userId = userId;
         this.status = status;
         this.total = total;
+        this.payment_method = payment_method;
+        this.shippingInfo = shippingInfo;
     }
 }

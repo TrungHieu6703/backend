@@ -42,6 +42,8 @@ public class AttributeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+
     // Xóa Attribute theo ID
     @CrossOrigin(origins = "http://localhost:4200")
     @DeleteMapping("/{id}")

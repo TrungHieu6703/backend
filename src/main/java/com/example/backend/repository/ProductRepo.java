@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.entity.Category;
 import com.example.backend.entity.Product;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -19,4 +20,5 @@ public interface ProductRepo extends JpaRepository<Product, String> {
 
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productAttributeValues pav LEFT JOIN FETCH pav.attributeValue av LEFT JOIN FETCH av.attribute a WHERE p.id IN :ids")
     List<Product> findAllByIdWithAttributes(@Param("ids") List<String> ids);
+
 }

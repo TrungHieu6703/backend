@@ -37,21 +37,32 @@ public class SecurityConfig implements WebMvcConfigurer {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private final String[] PUBLIC_ENDPOINTS = {
-            "users/login", "products/upload-multiple", "/products/**"
+            "users/login", "products/upload-multiple", "/products/**", "users/forgot-password", "/categories"
+            , "/api/filters/category/**", "/api/products/category/**", "/api/products/brand/**"
     };
-
+    private final String[] USER_ENDPOINTS = {
+            "/users/me", "/orders/user/**"
+    };
+    private final String[] ADMIN_ENDPOINTS = {
+            "/brands/**", "/attributes/**","/product-lines/**",
+            "/orders", "/categories/**", "/attribute-values/**", "/category-attributes/**", "/product-lines",
+            "/brands", "/product-attribute-values/**","/api/categories/**", "/api/attrbutes/**",
+            "/users/**", "/api/statistics/**", "/products/update/**"
+    };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable());
+
 
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/**").permitAll()
-                .requestMatchers( "/brands/**").hasRole("ADMIN")
-                .requestMatchers("/attributes/**").hasRole("ADMIN")
-                .requestMatchers("users/me").hasRole("ADMIN")
+                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                .requestMatchers(USER_ENDPOINTS).hasRole("USER")
+                .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
+                .anyRequest().denyAll()
+
         );
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

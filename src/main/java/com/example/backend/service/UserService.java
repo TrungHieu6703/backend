@@ -1,20 +1,28 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.request.EmailDTO;
 import com.example.backend.dto.request.LoginDTO;
 import com.example.backend.dto.request.UserDTO;
 import com.example.backend.dto.response.UserRes;
 import com.example.backend.entity.User;
 import com.example.backend.enums.RoleEnum;
 import com.example.backend.repository.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +41,9 @@ public class UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private MailService mailService;
 
     public UserRes createUser(UserDTO userDTO) {
         User user = new User();
@@ -76,8 +87,8 @@ public class UserService {
     public UserRes updateUser(String id, UserDTO userDTO) {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setName(userDTO.getName());
         user.setPhone(userDTO.getPhone());
         user.setEmail(userDTO.getEmail());
@@ -119,5 +130,34 @@ public class UserService {
                 user.getPhone(),
                 user.getEmail()
         );
+    }
+
+    public ResponseEntity<?> sendMail(EmailDTO emailDTO) {
+        try {
+            Boolean hasEmail = userRepo.existsByEmail(emailDTO.getEmail());
+            if (!hasEmail) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("email not found");
+            }
+            User user = userRepo.findByEmail(emailDTO.getEmail()).orElseThrow(
+                    () -> new EntityNotFoundException("Can't find email")
+            );
+            String randomPassword = UserService.randomString(15);
+            user.setPassword(passwordEncoder.encode(randomPassword));
+            userRepo.save(user);
+            mailService.sendEmail(emailDTO.getEmail(), randomPassword);
+        } catch (MailException mailException) {
+            System.out.println(mailException);
+        }
+
+        return ResponseEntity.ok("Congratulations! Your mail has been sent to the user.");
+    }
+
+    public static String randomString(int length) {
+         String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+         SecureRandom RANDOM = new SecureRandom();
+        return RANDOM.ints(length, 0, CHARACTERS.length())
+                .mapToObj(CHARACTERS::charAt)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
     }
 }

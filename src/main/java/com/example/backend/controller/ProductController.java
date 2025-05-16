@@ -3,12 +3,17 @@ package com.example.backend.controller;
 import com.example.backend.dto.request.AttributeValueDes;
 import com.example.backend.dto.request.ProductDTO;
 import com.example.backend.dto.response.ApiResponse;
+import com.example.backend.dto.response.CategoryRes;
 import com.example.backend.dto.response.ProductRes;
 import com.example.backend.dto.response.ProductResponseDTO;
+import com.example.backend.entity.Category;
 import com.example.backend.entity.Product;
 import com.example.backend.repository.AttributeValueRepo;
 import com.example.backend.repository.ProductAttributeValueRepo;
+import com.example.backend.repository.ProductRepo;
 import com.example.backend.service.ProductService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +36,8 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ProductRepo productRepo;
 
     // Tạo mới Product
     @PostMapping(value = "/create",
@@ -42,15 +49,19 @@ public class ProductController {
             @RequestPart("name") String name,
             @RequestPart("categoryId") String categoryId,
             @RequestPart("brandId") String brandId,
-            @RequestPart("couponId") String couponId,
+            @RequestPart("productLineId") String couponId,
             @RequestPart("price") String price,
             @RequestPart("quantity") String quantity,
             @RequestPart("description") String description,
+            @RequestPart("is_hot") String is_hot,
+            @RequestPart("specs_summary") String specs_summary,
             @RequestPart("attributes") List<AttributeValueDes> attributeValueDes
 
     ) {
         try {
-            ProductDTO data = new ProductDTO(name, categoryId, brandId, couponId, price, quantity, description, attributeValueDes );
+            boolean isHotBoolean = Boolean.parseBoolean(is_hot);
+
+            ProductDTO data = new ProductDTO(name, categoryId, brandId, couponId, price, quantity, description, isHotBoolean,specs_summary, attributeValueDes );
             ResponseEntity<?> productRes = productService.createProduct(data, files);
 
 //            ApiResponse<Product> response = new ApiResponse<>("Product created successfully", HttpStatus.CREATED.value(), productRes);
@@ -60,6 +71,45 @@ public class ProductController {
         }
         return null;
     }
+
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PutMapping(value = "/update/{id}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> updateProduct(
+            @PathVariable("id") String productId,
+            @RequestPart(value = "files", required = false) MultipartFile[] files,
+            @RequestPart("name") String name,
+            @RequestPart("categoryId") String categoryId,
+            @RequestPart("brandId") String brandId,
+            @RequestPart("productLineId") String productLineId,
+            @RequestPart("price") String price,
+            @RequestPart("quantity") String quantity,
+            @RequestPart("description") String description,
+            @RequestPart("is_hot") String is_hot, // Nhận là String thay vì boolean
+            @RequestPart("specs_summary") String specs_summary,
+            @RequestPart("existingImages") String existingImagesJson,
+            @RequestPart("attributes") List<AttributeValueDes> attributeValueDes
+    ) {
+        try {
+            // Chuyển đổi String "true"/"false" thành boolean
+            boolean isHotBoolean = Boolean.parseBoolean(is_hot);
+
+            ProductDTO data = new ProductDTO(name, categoryId, brandId, productLineId, price, quantity, description,
+                    isHotBoolean, specs_summary, attributeValueDes);
+            ResponseEntity<?> productRes = productService.updateProduct(productId, data, files, existingImagesJson);
+
+            ApiResponse<?> response = new ApiResponse<>("Product updated successfully", HttpStatus.OK.value(), productRes.getBody());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ApiResponse<?> errorResponse = new ApiResponse<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @PostMapping("/upload-multiple")
     public ResponseEntity<?> uploadMultipleFiles(@RequestParam("files1") MultipartFile[] files) {
         try {
@@ -80,6 +130,14 @@ public class ProductController {
         }
     }
 
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/check-quantity")
+    public ResponseEntity<Boolean> checkQuantity(@RequestParam String productId,
+                                                @RequestParam int quantity) {
+        boolean available = productService.checkQuantityAvailable(productId, quantity);
+        return ResponseEntity.ok(available);
+    }
 //    // Cập nhật Product theo ID
 //    @PutMapping("/{id}")
 //    public ResponseEntity<ApiResponse<ProductRes>> updateProduct(@PathVariable String id, @RequestBody ProductDTO productDTO) {

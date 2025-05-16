@@ -33,6 +33,8 @@ public class Order {
 
     BigDecimal total;
 
+    String payment_method;
+
     @Column(columnDefinition = "TEXT")
     String shippingInfo;
 

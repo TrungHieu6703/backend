@@ -54,6 +54,8 @@ public class GroupController {
         }
     }
 
+
+
 //    @GetMapping("categories/{id}/attributes")
 //    public List<Attribute> getAttributeById(@PathVariable String id) {
 //        List<Attribute> Attributes = categoryAttributeRepo.findAttributesByCategoryId(id);

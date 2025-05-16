@@ -19,6 +19,8 @@ public class OrderDetailRes {
 
     private String productId;
 
+//    private String shippingInfo;
+
     private int quantity;
 
     private BigDecimal price;

@@ -2,7 +2,11 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.request.ProductAttributeValueDTO;
 import com.example.backend.dto.response.ApiResponse;
+import com.example.backend.dto.response.CategoryRes;
+import com.example.backend.dto.response.ProductAttributeResponseDTO;
 import com.example.backend.dto.response.ProductAttributeValueRes;
+import com.example.backend.entity.Category;
+import com.example.backend.repository.ProductAttributeValueRepo;
 import com.example.backend.service.ProductAttributeValueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,8 @@ public class ProductAttributeValueController {
 
     @Autowired
     private ProductAttributeValueService productAttributeValueService;
+    @Autowired
+    private ProductAttributeValueRepo productAttributeValueRepo;
 
     // Tạo mới ProductAttributeValue
     @PostMapping
@@ -56,5 +62,17 @@ public class ProductAttributeValueController {
         List<ProductAttributeValueRes> productAttributeValues = productAttributeValueService.getAllProductAttributeValues();
         ApiResponse<List<ProductAttributeValueRes>> response = new ApiResponse<>("All product attribute values retrieved successfully", HttpStatus.OK.value(), productAttributeValues);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{productId}/attributes")
+    public ResponseEntity<List<ProductAttributeResponseDTO>> getProductAttributes(@PathVariable String productId) {
+        List<ProductAttributeResponseDTO> attributes = productAttributeValueService.getProductAttributes(productId);
+        return ResponseEntity.ok(attributes);
+    }
+
+    @GetMapping("/{productId}/category")
+    public ResponseEntity<Category> findCategoryById(@PathVariable String productId) {
+        Category categoryRes = productAttributeValueRepo.findCategoryByProductId(productId);
+        return ResponseEntity.ok(categoryRes);
     }
 }

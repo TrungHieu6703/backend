@@ -26,5 +26,12 @@ public class CategoryAttribute {
     @JoinColumn(name = "category_id")
     Category category;
 
-    boolean visible;
+    @Column(name = "visible", nullable = false)
+    boolean visible = true;
+
+    @Column(name = "display", nullable = false)
+    boolean display = false;
+
+    @Column(name = "filter", nullable = false)
+    boolean filter = false;
 }
