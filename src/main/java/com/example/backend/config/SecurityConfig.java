@@ -38,16 +38,18 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     private final String[] PUBLIC_ENDPOINTS = {
             "users/login", "products/upload-multiple", "/products/**", "users/forgot-password", "/categories"
-            , "/api/filters/category/**", "/api/products/category/**", "/api/products/brand/**"
+            , "/api/filters/category/**", "/api/products/category/**", "/api/products/brand/**", "/products/real-time search/", "/api/laptops/compare/**"
+            ,"/api/laptops/product/**",  "/api/products/productline/**", "/api/laptops/items", "/orders", "/api/v1/payment-callback/**", "/users/**"
     };
     private final String[] USER_ENDPOINTS = {
-            "/users/me", "/orders/user/**"
+            "/users/me", "/orders/user/**", "/orders/**", "/users/**", "/users/users/change-password/**",
+            "api/laptops/items", "/api/v1/pay/**"
     };
     private final String[] ADMIN_ENDPOINTS = {
             "/brands/**", "/attributes/**","/product-lines/**",
             "/orders", "/categories/**", "/attribute-values/**", "/category-attributes/**", "/product-lines",
             "/brands", "/product-attribute-values/**","/api/categories/**", "/api/attrbutes/**",
-            "/users/**", "/api/statistics/**", "/products/update/**"
+            "/users/**", "/api/statistics/**", "/products/update/**", "/products/hot"
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

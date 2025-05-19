@@ -24,7 +24,7 @@ public class JwtService {
             JWSSigner signer = new MACSigner(sharedSecretKey);
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(username)
-                    .expirationTime(new Date(new Date().getTime() + 5 * 60 * 1000))
+                    .expirationTime(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))
                     .build();
 
             SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);

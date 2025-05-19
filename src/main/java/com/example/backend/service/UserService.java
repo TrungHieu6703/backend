@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.request.ChangePasswordDTO;
 import com.example.backend.dto.request.EmailDTO;
 import com.example.backend.dto.request.LoginDTO;
 import com.example.backend.dto.request.UserDTO;
@@ -87,8 +88,6 @@ public class UserService {
     public UserRes updateUser(String id, UserDTO userDTO) {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setName(userDTO.getName());
         user.setPhone(userDTO.getPhone());
         user.setEmail(userDTO.getEmail());
@@ -97,6 +96,37 @@ public class UserService {
 
         return new UserRes(updatedUser.getId(), updatedUser.getUsername(), updatedUser.getPassword(), updatedUser.getName(),updatedUser.getRole(),updatedUser.getPhone(), updatedUser.getEmail());
     }
+
+    public UserRes changeUserPassword(String id, ChangePasswordDTO changePasswordDTO) {
+        // Kiểm tra xem mật khẩu mới và xác nhận mật khẩu có khớp nhau không
+        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
+            throw new RuntimeException("New password and confirm password do not match");
+        }
+
+        // Tìm người dùng theo ID
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Xác thực mật khẩu hiện tại
+        if (!passwordEncoder.matches(changePasswordDTO.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+        User updatedUser = userRepo.save(user);
+
+        return new UserRes(
+                updatedUser.getId(),
+                updatedUser.getUsername(),
+                updatedUser.getPassword(),
+                updatedUser.getName(),
+                updatedUser.getRole(),
+                updatedUser.getPhone(),
+                updatedUser.getEmail()
+        );
+    }
+
 
     public void deleteUser(String id) {
         User user = userRepo.findById(id)

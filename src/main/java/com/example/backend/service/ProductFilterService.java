@@ -6,9 +6,11 @@ import com.example.backend.entity.Attribute;
 import com.example.backend.entity.AttributeValue;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.ProductAttributeValue;
+import com.example.backend.entity.Category;
 import com.example.backend.repository.AttributeValueRepo;
 import com.example.backend.repository.CategoryAttributeRepo;
 import com.example.backend.repository.ProductRepo;
+import com.example.backend.repository.CategoryRepo;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -37,6 +39,9 @@ public class ProductFilterService {
     @Autowired
     private AttributeValueRepo attributeValueRepo;
 
+    @Autowired
+    private CategoryRepo categoryRepo;
+
     public List<ProductFilterDTO> getProductsByProductLine(
             String productLineId,
             Map<String, String> filters,
@@ -64,8 +69,11 @@ public class ProductFilterService {
 
         Pageable pageable = PageRequest.of(page, size);
 
+        // Lấy danh sách các ID danh mục (bao gồm danh mục hiện tại và các danh mục con nếu có)
+        List<String> categoryIds = getCategoryIdsForFiltering(categoryId);
+
         // Tạo specification để lọc sản phẩm
-        Specification<Product> spec = createFilterSpecification(categoryId, null, null, filters);
+        Specification<Product> spec = createFilterSpecificationForCategories(categoryIds, null, null, filters);
 
         Page<Product> productPage = productRepo.findAll(spec, pageable);
 
@@ -127,7 +135,70 @@ public class ProductFilterService {
         return result;
     }
 
-    // Helper method để tạo specification cho việc lọc
+    // Lấy danh sách tất cả ID danh mục (danh mục hiện tại và các danh mục con)
+    private List<String> getCategoryIdsForFiltering(String categoryId) {
+        List<String> categoryIds = new ArrayList<>();
+        categoryIds.add(categoryId);
+
+        // Tìm các danh mục con có parentId = categoryId
+        List<Category> childCategories = categoryRepo.findByParentId(categoryId);
+        if (childCategories != null && !childCategories.isEmpty()) {
+            for (Category child : childCategories) {
+                categoryIds.add(child.getId());
+            }
+        }
+
+        return categoryIds;
+    }
+
+    // Helper method để tạo specification cho việc lọc với nhiều danh mục
+    private Specification<Product> createFilterSpecificationForCategories(
+            List<String> categoryIds,
+            String brandId,
+            String productLineId,
+            Map<String, String> filters) {
+
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Lọc theo danh mục (sử dụng IN để lọc theo nhiều danh mục)
+            if (categoryIds != null && !categoryIds.isEmpty()) {
+                predicates.add(root.get("category").get("id").in(categoryIds));
+            }
+
+            // Lọc theo thương hiệu
+            if (brandId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("brand").get("id"), brandId));
+            }
+
+            // Lọc theo dòng sản phẩm
+            if (productLineId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("product_line").get("id"), productLineId));
+            }
+
+            // Xử lý các bộ lọc
+            if (filters != null && !filters.isEmpty()) {
+                for (Map.Entry<String, String> entry : filters.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+
+                    // Kiểm tra nếu key có dạng "attr_{id}"
+                    if (key.startsWith("attr_")) {
+                        String attributeValueId = value;
+
+                        // Join với ProductAttributeValue để lọc
+                        Join<Product, ProductAttributeValue> pavJoin = root.join("productAttributeValues", JoinType.LEFT);
+
+                        predicates.add(criteriaBuilder.equal(pavJoin.get("attributeValue").get("id"), attributeValueId));
+                    }
+                }
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    // Giữ lại phương thức cũ để tương thích ngược
     private Specification<Product> createFilterSpecification(
             String categoryId,
             String brandId,

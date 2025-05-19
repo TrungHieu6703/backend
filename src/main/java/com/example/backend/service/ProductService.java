@@ -280,9 +280,17 @@ public class ProductService {
 //                        product.getImage(), product.getDescription()))
 //                .collect(Collectors.toList());
 //    }
-public List<ProductResponseDTO> getAllProducts() {
-    return productRepo.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+public List<ProductResponseDTO> getAllProductsHot() {
+    return productRepo.findAllByIsHotTrue().stream().map(this::convertToDTO).collect(Collectors.toList());
 }
+
+    public List<ProductResponseDTO> getAllProducts() {
+        return productRepo.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public List<ProductResponseDTO> searchProducts(String keyword) {
+        return productRepo.searchByName(keyword).stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
 
     private ProductResponseDTO convertToDTO(Product product) {
         ProductResponseDTO dto = new ProductResponseDTO();

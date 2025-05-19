@@ -173,4 +173,15 @@ public class ProductController {
 public List<ProductResponseDTO> getAllProducts() {
     return productService.getAllProducts();
 }
+
+    @GetMapping("/hot")
+    public List<ProductResponseDTO> getAllProductsHot() {
+        return productService.getAllProductsHot();
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/real-time-search")
+    public List<ProductResponseDTO> searchProducts(@RequestParam String keyword) {
+        return productService.searchProducts(keyword);
+    }
 }

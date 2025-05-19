@@ -12,6 +12,9 @@ public interface CategoryRepo extends JpaRepository<Category, String> {
     @Query("SELECT COUNT(*) > 0 FROM Product p WHERE p.category.id = :categoryId")
     boolean existsProductsByCategoryId(@Param("categoryId") String categoryId);
 
+    List<Category> findByParentId(String parentId);
+
+
     @Query("SELECT b FROM Category b WHERE b.is_deleted = false")
     List<Category> findAllActiveCategories();
 }

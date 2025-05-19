@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.request.ChangePasswordDTO;
 import com.example.backend.dto.request.EmailDTO;
 import com.example.backend.dto.request.LoginDTO;
 import com.example.backend.dto.request.UserDTO;
@@ -56,6 +57,14 @@ public class UserController {
         ApiResponse<UserRes> response = new ApiResponse<>("User updated successfully", HttpStatus.OK.value(), updatedUser);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("change-password/{id}")
+    public ResponseEntity<ApiResponse<UserRes>> changePassword(@PathVariable String id, @RequestBody ChangePasswordDTO changePasswordDTO) {
+        UserRes updatedUser = userService.changeUserPassword(id, changePasswordDTO);
+        ApiResponse<UserRes> response = new ApiResponse<>("Password updated successfully", HttpStatus.OK.value(), updatedUser);
+        return ResponseEntity.ok(response);
+    }
+
 
     // Xóa User theo ID
     @DeleteMapping("/{id}")
